@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'ozzy_neck_movement = ozzy_ros.ozzy_neck_movement:main',
-            'ozzy_speak = ozzy_ros.ozzy_speak:main'
+            'ozzy_speak = ozzy_ros.ozzy_speak:main',
+            'ozzy_see = ozzy_ros.ozzy_see:main',
         ],
     },
 )
