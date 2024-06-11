@@ -10,14 +10,23 @@ class MouthServoController(Node):
     def __init__(self, timings, audio_file):
         super().__init__('mouth_servo_controller')
         self.publisher_mouth = self.create_publisher(Int32, 'ozzy/servo/mouth', 10)
+        self.publisher_neck_pan = self.create_publisher(Int32, 'ozzy/servo/neck/pan', 10)
+        
+        neck_msg = Int32()
         self.timings = timings
-        self.index = 0
+        self.index = 65
         self.state = False
         self.audio_file = audio_file
         self.get_logger().info('Mouth Servo Controller Node has been started.')
         self.timer = self.create_timer(0.1, self.timer_callback)  # Adjust the frequency as needed
+        neck_msg.data = 0
+        self.publisher_neck_pan.publish(neck_msg)
+        time.sleep(1)
+        neck_msg.data = 90
+        self.publisher_neck_pan.publish(neck_msg)
 
         # Start the audio in a separate thread to play while moving the servo
+
         audio_thread = Thread(target=self.play_audio)
         audio_thread.start()
 
@@ -27,13 +36,13 @@ class MouthServoController(Node):
     def timer_callback(self):
         if self.index < len(self.timings):
             msg = Int32()
-            msg.data = 70 if self.state else 180  # Adjust as per your servo's range
+            msg.data = 65 if self.state else 80 # Adjust as per your servo's range
             self.publisher_mouth.publish(msg)
             self.get_logger().info(f'Publishing Mouth Angle: {msg.data}')
             
             self.state = not self.state
             self.get_logger().info(f'Waiting for {self.timings[self.index]} milliseconds')
-            time.sleep(self.timings[self.index] / 1000.0)  # Sleep for the specified timing
+            time.sleep(self.timings[self.index]*2 / 1000.0)  # Sleep for the specified timing
             self.index += 1
         else:
             self.get_logger().info('Completed all timings. Stopping.')
